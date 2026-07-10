@@ -4,6 +4,7 @@ import { Toaster } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { ErrorBoundary } from './ErrorBoundary'
+import { ReloadPrompt } from './ReloadPrompt'
 import { ThemeProvider } from './theme'
 import { UiStateProvider } from './ui-state'
 import { AppLayout } from './layout/AppLayout'
@@ -91,6 +92,7 @@ export function App() {
                 </Routes>
               </HashRouter>
               <Toaster position="bottom-center" />
+              <ReloadPrompt />
             </UiStateProvider>
           </AuthProvider>
         </QueryClientProvider>
