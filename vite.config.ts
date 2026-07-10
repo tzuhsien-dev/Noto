@@ -20,8 +20,12 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: 'jsdom',
+    // jsdom only exposes localStorage for a non-opaque origin.
+    environmentOptions: { jsdom: { url: 'http://localhost/' } },
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     globals: false,
+    // Component tests run against the in-memory fake backend.
+    env: { VITE_E2E: '1' },
   },
 }))

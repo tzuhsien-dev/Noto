@@ -90,3 +90,85 @@ body {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
+
+/* Markdown typography (scoped — no global element styles) */
+.prose-noto h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.35em;
+}
+.prose-noto h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.35em;
+}
+.prose-noto h3,
+.prose-noto h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.35em;
+}
+.prose-noto p {
+  margin: 0.5em 0;
+}
+.prose-noto ul,
+.prose-noto ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+.prose-noto ul {
+  list-style: disc;
+}
+.prose-noto ol {
+  list-style: decimal;
+}
+.prose-noto li {
+  margin: 0.15em 0;
+}
+.prose-noto input[type='checkbox'] {
+  margin-right: 0.4em;
+}
+.prose-noto code {
+  background: var(--muted);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.85em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.prose-noto pre {
+  background: var(--muted);
+  border-radius: 6px;
+  padding: 0.75em;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+.prose-noto pre code {
+  background: transparent;
+  padding: 0;
+}
+.prose-noto blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 0.75em;
+  color: var(--muted-foreground);
+  margin: 0.5em 0;
+}
+.prose-noto a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.prose-noto table {
+  border-collapse: collapse;
+  margin: 0.5em 0;
+  display: block;
+  overflow-x: auto;
+}
+.prose-noto th,
+.prose-noto td {
+  border: 1px solid var(--border);
+  padding: 0.25em 0.6em;
+}
+.prose-noto hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1em 0;
+}
