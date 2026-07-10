@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { clearLocalData } from '@/db/database'
 import { getBackend } from '@/lib/backend'
+import { stopSyncEngine } from '@/sync/engine'
 import type { BackendClient, BackendUser } from '@/lib/backend/types'
 
 export type AuthState =
@@ -82,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     const backend = backendRef.current
+    stopSyncEngine()
     try {
       await backend?.signOut()
     } finally {

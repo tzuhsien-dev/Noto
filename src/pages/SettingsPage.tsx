@@ -1,5 +1,5 @@
 import { toast } from 'sonner'
-import { LogOut } from 'lucide-react'
+import { LogOut, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NativeSelect } from '@/components/ui/input'
 import { PageContainer, PageHeader } from '@/components/PageHeader'
@@ -8,6 +8,7 @@ import { usePendingCount } from '@/features/data/hooks'
 import { useSyncStatus } from '@/sync/status'
 import { formatRelative } from '@/domain/dates'
 import { useTheme, type ThemeSetting } from '@/app/theme'
+import { requestSync } from '@/sync/engine'
 import { SettingsDataSection } from '@/features/settings/SettingsDataSection'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -85,6 +86,15 @@ export function SettingsPage() {
               </p>
             ) : null}
           </dl>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => requestSync()}
+            data-retry-sync
+          >
+            <RefreshCw className="h-4 w-4" aria-hidden /> Sync now
+          </Button>
         </Section>
 
         <SettingsDataSection />

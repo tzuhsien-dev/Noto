@@ -2,6 +2,16 @@ import type { NotoDatabase } from './database'
 import type { PendingMutation, PendingOperation } from '@/domain/types'
 import { newId, nowIso } from '@/domain/types'
 
+/**
+ * The sync engine registers here to learn about new local writes without
+ * the db layer importing the engine (keeps the dependency one-directional).
+ */
+let onMutationEnqueued: (() => void) | null = null
+
+export function setOnMutationEnqueued(callback: (() => void) | null): void {
+  onMutationEnqueued = callback
+}
+
 type EnqueueArgs = {
   entityType: PendingMutation['entityType']
   entityId: string
@@ -41,6 +51,7 @@ export async function enqueueMutation(db: NotoDatabase, args: EnqueueArgs): Prom
       attempts: 0,
       lastError: null,
     })
+    onMutationEnqueued?.()
     return
   }
 
@@ -59,6 +70,7 @@ export async function enqueueMutation(db: NotoDatabase, args: EnqueueArgs): Prom
     attempts: 0,
     lastError: null,
   })
+  onMutationEnqueued?.()
 }
 
 export async function pendingCount(db: NotoDatabase): Promise<number> {

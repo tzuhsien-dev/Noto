@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/alert-dialog'
 import { clearLocalData } from '@/db/database'
+import { requestSync } from '@/sync/engine'
 
 /**
  * Local data management. Export/import arrive with the sync-aware data
@@ -13,8 +14,9 @@ export function SettingsDataSection() {
 
   const clearCache = async () => {
     await clearLocalData()
+    requestSync() // cursors were cleared too, so this is a full re-download
     toast('Local cache cleared', {
-      description: 'Data will be re-downloaded from the cloud on the next sync.',
+      description: 'Re-downloading your data from the cloud.',
     })
   }
 

@@ -10,6 +10,8 @@ import { useUserId } from '@/features/auth/AuthProvider'
 import { NewTaskDialog } from '@/features/tasks/NewTaskDialog'
 import { SearchDialog } from '@/features/search/SearchDialog'
 import { useUiState } from '@/app/ui-state'
+import { startSyncEngine, stopSyncEngine } from '@/sync/engine'
+import { useAuth } from '@/features/auth/AuthProvider'
 import { cn } from '@/lib/utils'
 import { NOTE_NAV, ORG_NAV, TASK_NAV, type NavItem } from './nav-items'
 import { SyncStatusChip } from './SyncStatusChip'
@@ -103,7 +105,16 @@ export function AppLayout() {
   const { setNewTaskOpen, setSearchOpen } = useUiState()
   const navigate = useNavigate()
   const userId = useUserId()
+  const { backend } = useAuth()
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // One sync engine per signed-in session; StrictMode double-mounts are
+  // handled by the cleanup stopping the previous instance.
+  useEffect(() => {
+    if (!backend) return undefined
+    startSyncEngine(backend, userId)
+    return stopSyncEngine
+  }, [backend, userId])
 
   // Global shortcuts: N (task), Shift+N (note), / (search).
   useEffect(() => {
