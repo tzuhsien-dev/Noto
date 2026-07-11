@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git workflow
+
+- **Commit and push directly to `main`** — do not create feature branches for changes.
+- **Never open pull requests** and do not manage or wait on CI. When the user says "commit + push", commit to `main` and push; that's the whole job.
+
 ## Commands
 
 ```bash
