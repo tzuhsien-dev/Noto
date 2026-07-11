@@ -79,7 +79,10 @@ export function TaskItem({
         {task.description ? (
           <span className="block truncate text-xs text-muted-foreground">{task.description}</span>
         ) : null}
-        {(task.dueAt || task.priority !== 'none' || (!hideProject && project) || tags.length > 0) && (
+        {(task.dueAt ||
+          task.priority !== 'none' ||
+          (!hideProject && project) ||
+          tags.length > 0) && (
           <span className="mt-1 flex flex-wrap items-center gap-1.5">
             {task.dueAt ? (
               <Badge variant={overdue ? 'destructive' : 'outline'}>
