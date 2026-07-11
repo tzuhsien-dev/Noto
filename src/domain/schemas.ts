@@ -47,12 +47,24 @@ export const checklistItemSchema = z.object({
   version: z.number().int().min(1),
 })
 
+export const areaSchema = z.object({
+  id: z.uuid(),
+  userId: z.uuid(),
+  name: z.string().min(1).max(200),
+  position: z.number(),
+  createdAt: isoDate,
+  updatedAt: isoDate,
+  version: z.number().int().min(1),
+})
+
 export const projectSchema = z.object({
   id: z.uuid(),
   userId: z.uuid(),
   name: z.string().min(1).max(200),
   icon: z.string().max(50).nullable(),
   position: z.number(),
+  // Optional with default so pre-area exports (schema v1) still validate.
+  areaId: z.uuid().nullable().default(null),
   archived: z.boolean(),
   createdAt: isoDate,
   updatedAt: isoDate,

@@ -43,12 +43,23 @@ export type ChecklistItem = {
   version: number
 }
 
+export type Area = {
+  id: string
+  userId: string
+  name: string
+  position: number
+  createdAt: string
+  updatedAt: string
+  version: number
+}
+
 export type Project = {
   id: string
   userId: string
   name: string
   icon: string | null
   position: number
+  areaId: string | null
   archived: boolean
   createdAt: string
   updatedAt: string
@@ -76,7 +87,7 @@ export type NoteTag = {
   userId: string
 }
 
-export type EntityType = 'task' | 'note' | 'checklistItem' | 'project' | 'tag'
+export type EntityType = 'task' | 'note' | 'checklistItem' | 'project' | 'tag' | 'area'
 
 export type PendingOperation = 'insert' | 'update' | 'delete'
 

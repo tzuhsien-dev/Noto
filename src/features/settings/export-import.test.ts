@@ -114,6 +114,36 @@ describe('merge import', () => {
     expect(parsed.data.tasks.map((t) => t.title)).toEqual(['Before import'])
   })
 
+  it('accepts pre-area exports (no areas key) and ungroups orphan area references', async () => {
+    const source = new NotoDatabase(`noto-export-area-${counter}`)
+    await createTask({ userId: USER_B, title: 'Old export task' }, source)
+    const file = await buildExport(source)
+    // Simulate a v1 export written before areas existed…
+    const legacy = JSON.parse(JSON.stringify(file)) as Record<string, { [k: string]: unknown }>
+    delete legacy.data!.areas
+    // …that somehow carries a project pointing at an unknown area.
+    legacy.data!.projects = [
+      {
+        id: crypto.randomUUID(),
+        userId: USER_B,
+        name: 'Orphan',
+        icon: null,
+        position: 0,
+        areaId: crypto.randomUUID(),
+        archived: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        version: 1,
+      },
+    ]
+
+    const preview = await validateImport(JSON.stringify(legacy), db)
+    await mergeImport(preview.file, USER_A, db)
+    const projects = await db.projects.toArray()
+    expect(projects).toHaveLength(1)
+    expect(projects[0]!.areaId).toBeNull()
+  })
+
   it('skips orphan checklist items and join rows', async () => {
     const source = new NotoDatabase(`noto-export-orphan-${counter}`)
     const note = await createNote({ userId: USER_B, title: 'Parent' }, source)

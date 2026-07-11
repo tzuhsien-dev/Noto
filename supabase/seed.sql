@@ -31,9 +31,13 @@ insert into auth.identities (
   'email', now(), now(), now()
 );
 
-insert into public.projects (id, user_id, name, position) values
-  ('22222222-2222-4222-8222-222222222201', '11111111-1111-4111-8111-111111111111', 'Household', 0),
-  ('22222222-2222-4222-8222-222222222202', '11111111-1111-4111-8111-111111111111', 'Hobby coding', 1);
+insert into public.areas (id, user_id, name, position) values
+  ('77777777-7777-4777-8777-777777777701', '11111111-1111-4111-8111-111111111111', 'Life', 0);
+
+insert into public.projects (id, user_id, name, position, area_id) values
+  ('22222222-2222-4222-8222-222222222201', '11111111-1111-4111-8111-111111111111', 'Household', 0,
+   '77777777-7777-4777-8777-777777777701'),
+  ('22222222-2222-4222-8222-222222222202', '11111111-1111-4111-8111-111111111111', 'Hobby coding', 1, null);
 
 insert into public.tasks (id, user_id, title, description, priority, due_at, project_id) values
   ('33333333-3333-4333-8333-333333333301', '11111111-1111-4111-8111-111111111111',

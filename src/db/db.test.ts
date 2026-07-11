@@ -11,6 +11,8 @@ import {
 } from './repo/tasks'
 import { addChecklistItem, createNote, softDeleteNote, updateNote } from './repo/notes'
 import { createTag, deleteTag, setTaskTags } from './repo/tags'
+import { createArea, deleteArea } from './repo/areas'
+import { createProject } from './repo/projects'
 
 const USER = '00000000-0000-4000-8000-0000000000aa'
 
@@ -156,5 +158,38 @@ describe('tags', () => {
     await setTaskTags(task.id, USER, [t2.id], db)
     const rows = await db.task_tags.toArray()
     expect(rows).toEqual([{ taskId: task.id, tagId: t2.id, userId: USER }])
+  })
+})
+
+describe('areas', () => {
+  it('groups projects and ungroups them when the area is deleted', async () => {
+    const area = await createArea({ userId: USER, name: 'Work' }, db)
+    const grouped = await createProject({ userId: USER, name: 'RGD', areaId: area.id }, db)
+    const loose = await createProject({ userId: USER, name: 'Chores' }, db)
+    expect((await db.projects.get(grouped.id))?.areaId).toBe(area.id)
+    expect((await db.projects.get(loose.id))?.areaId).toBeNull()
+
+    await deleteArea(area.id, db)
+    expect(await db.areas.count()).toBe(0)
+    expect((await db.projects.get(grouped.id))?.areaId).toBeNull()
+    // The ungrouping is queued for sync (insert + update coalesce to insert).
+    const pending = await pendingFor(db, 'project', grouped.id)
+    expect(pending?.operation).toBe('insert')
+    expect((pending?.payload as { areaId: string | null }).areaId).toBeNull()
+  })
+
+  it('queues a delete mutation for a synced area', async () => {
+    const area = await createArea({ userId: USER, name: 'Life' }, db)
+    // Simulate the insert having been pushed already.
+    await db.pending_mutations.where('[entityType+entityId]').equals(['area', area.id]).delete()
+    await deleteArea(area.id, db)
+    const pending = await pendingFor(db, 'area', area.id)
+    expect(pending?.operation).toBe('delete')
+  })
+
+  it('assigns increasing area positions', async () => {
+    const first = await createArea({ userId: USER, name: 'One' }, db)
+    const second = await createArea({ userId: USER, name: 'Two' }, db)
+    expect(second.position).toBeGreaterThan(first.position)
   })
 })

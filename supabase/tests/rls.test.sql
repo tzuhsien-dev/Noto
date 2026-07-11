@@ -6,7 +6,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(26);
+select plan(28);
 
 -- Two users created directly in auth (bypassing signup) for the test run.
 insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, raw_app_meta_data, raw_user_meta_data)
@@ -15,9 +15,12 @@ values
   ('00000000-0000-0000-0000-000000000000', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'authenticated', 'authenticated', 'user-b@test.local', 'x', now(), now(), now(), '{}', '{}');
 
 -- Seed one row per table for each user (as superuser, bypassing RLS).
-insert into public.projects (id, user_id, name) values
-  ('10000000-0000-4000-8000-00000000000a', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'A project'),
-  ('10000000-0000-4000-8000-00000000000b', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'B project');
+insert into public.areas (id, user_id, name) values
+  ('60000000-0000-4000-8000-00000000000a', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'A area'),
+  ('60000000-0000-4000-8000-00000000000b', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'B area');
+insert into public.projects (id, user_id, name, area_id) values
+  ('10000000-0000-4000-8000-00000000000a', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'A project', '60000000-0000-4000-8000-00000000000a'),
+  ('10000000-0000-4000-8000-00000000000b', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'B project', '60000000-0000-4000-8000-00000000000b');
 insert into public.tasks (id, user_id, title) values
   ('20000000-0000-4000-8000-00000000000a', 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', 'A task'),
   ('20000000-0000-4000-8000-00000000000b', 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', 'B task');
@@ -46,6 +49,7 @@ set local request.jwt.claims to '';
 select throws_ok('select count(*) from public.tasks', '42501', null, 'anon cannot read tasks');
 select throws_ok('select count(*) from public.notes', '42501', null, 'anon cannot read notes');
 select throws_ok('select count(*) from public.projects', '42501', null, 'anon cannot read projects');
+select throws_ok('select count(*) from public.areas', '42501', null, 'anon cannot read areas');
 select throws_ok('select count(*) from public.tags', '42501', null, 'anon cannot read tags');
 select throws_ok('select count(*) from public.checklist_items', '42501', null, 'anon cannot read checklist items');
 select throws_ok('select count(*) from public.task_tags', '42501', null, 'anon cannot read task_tags');
@@ -71,6 +75,9 @@ select results_eq(
 select results_eq(
   'select name from public.projects order by name',
   array['A project'::text], 'A sees only own projects');
+select results_eq(
+  'select name from public.areas order by name',
+  array['A area'::text], 'A sees only own areas');
 select results_eq(
   'select name from public.tags order by name',
   array['a-tag'::text], 'A sees only own tags');

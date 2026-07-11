@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type {
+  Area,
   ChecklistItem,
   Note,
   NoteTag,
@@ -20,6 +21,7 @@ export class NotoDatabase extends Dexie {
   notes!: EntityTable<Note, 'id'>
   checklist_items!: EntityTable<ChecklistItem, 'id'>
   projects!: EntityTable<Project, 'id'>
+  areas!: EntityTable<Area, 'id'>
   tags!: EntityTable<Tag, 'id'>
   task_tags!: Dexie.Table<TaskTag, [string, string]>
   note_tags!: Dexie.Table<NoteTag, [string, string]>
@@ -41,6 +43,20 @@ export class NotoDatabase extends Dexie {
       pending_mutations: 'id, createdAt, [entityType+entityId]',
       sync_meta: 'key',
     })
+    // v2: areas (grouping level above projects) + projects.areaId.
+    this.version(2)
+      .stores({
+        areas: 'id, position',
+        projects: 'id, position, areaId',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('projects')
+          .toCollection()
+          .modify((project: Project) => {
+            project.areaId ??= null
+          })
+      })
   }
 }
 

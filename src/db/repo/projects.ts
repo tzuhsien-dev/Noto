@@ -4,7 +4,7 @@ import type { Project } from '@/domain/types'
 import { newId, nowIso } from '@/domain/types'
 
 export async function createProject(
-  input: { userId: string; name: string; icon?: string | null },
+  input: { userId: string; name: string; icon?: string | null; areaId?: string | null },
   database: NotoDatabase = db,
 ): Promise<Project> {
   const now = nowIso()
@@ -17,6 +17,7 @@ export async function createProject(
       name: input.name,
       icon: input.icon ?? null,
       position,
+      areaId: input.areaId ?? null,
       archived: false,
       createdAt: now,
       updatedAt: now,
@@ -36,7 +37,7 @@ export async function createProject(
 
 export async function updateProject(
   id: string,
-  patch: Partial<Pick<Project, 'name' | 'icon' | 'archived' | 'position'>>,
+  patch: Partial<Pick<Project, 'name' | 'icon' | 'archived' | 'position' | 'areaId'>>,
   database: NotoDatabase = db,
 ): Promise<Project | undefined> {
   return database.transaction('rw', [database.projects, database.pending_mutations], async () => {

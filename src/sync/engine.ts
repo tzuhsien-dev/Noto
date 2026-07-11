@@ -11,7 +11,7 @@ import { setSyncStatus } from './status'
 
 const PULL_PAGE_SIZE = 500
 const MAX_BACKOFF_MS = 5 * 60_000
-const ENTITY_TYPES: EntityType[] = ['project', 'tag', 'task', 'note', 'checklistItem']
+const ENTITY_TYPES: EntityType[] = ['area', 'project', 'tag', 'task', 'note', 'checklistItem']
 const JOIN_KINDS: JoinKind[] = ['taskTag', 'noteTag']
 
 /**
@@ -31,6 +31,8 @@ function tableFor(entityType: EntityType): Dexie.Table<EntityRow, string> {
       return db.projects as unknown as Dexie.Table<EntityRow, string>
     case 'tag':
       return db.tags as unknown as Dexie.Table<EntityRow, string>
+    case 'area':
+      return db.areas as unknown as Dexie.Table<EntityRow, string>
   }
 }
 

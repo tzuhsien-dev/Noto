@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createNote } from '@/db/repo/notes'
 import { openCountByProject } from '@/domain/filters'
-import { useProjects, useTasks } from '@/features/data/hooks'
+import { useAreas, useProjects, useTasks } from '@/features/data/hooks'
 import { useUserId } from '@/features/auth/AuthProvider'
 import { NewTaskDialog } from '@/features/tasks/NewTaskDialog'
 import { SearchDialog } from '@/features/search/SearchDialog'
@@ -36,10 +36,43 @@ function NavLinkItem({ item, onNavigate }: { item: NavItem; onNavigate?: () => v
   )
 }
 
+function ProjectLink({
+  project,
+  count,
+  onNavigate,
+}: {
+  project: { id: string; name: string }
+  count: number | undefined
+  onNavigate?: () => void
+}) {
+  return (
+    <NavLink
+      to={`/projects/${project.id}`}
+      onClick={onNavigate}
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm',
+          isActive ? 'bg-accent font-medium' : 'hover:bg-accent/60',
+        )
+      }
+    >
+      <span className="min-w-0 truncate">{project.name}</span>
+      {count ? <Badge className="ml-auto">{count}</Badge> : null}
+    </NavLink>
+  )
+}
+
 function NavContent({ onNavigate }: { onNavigate?: () => void }) {
+  const areas = useAreas() ?? []
   const projects = (useProjects() ?? []).filter((p) => !p.archived)
   const tasks = useTasks() ?? []
   const counts = openCountByProject(tasks)
+  const areaIds = new Set(areas.map((a) => a.id))
+  const grouped = areas
+    .map((area) => ({ area, projects: projects.filter((p) => p.areaId === area.id) }))
+    .filter((group) => group.projects.length > 0)
+  // Projects without an area (or pointing at one not yet synced) stay flat.
+  const ungrouped = projects.filter((p) => !p.areaId || !areaIds.has(p.areaId))
 
   const navProps = onNavigate === undefined ? {} : { onNavigate }
   return (
@@ -57,28 +90,33 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
           <NavLinkItem key={item.to} item={item} {...navProps} />
         ))}
       </div>
-      {projects.length > 0 ? (
+      {grouped.map(({ area, projects: areaProjects }) => (
+        <div key={area.id} className="space-y-0.5">
+          <p className="px-2.5 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            {area.name}
+          </p>
+          {areaProjects.map((project) => (
+            <ProjectLink
+              key={project.id}
+              project={project}
+              count={counts.get(project.id)}
+              {...navProps}
+            />
+          ))}
+        </div>
+      ))}
+      {ungrouped.length > 0 ? (
         <div className="space-y-0.5">
           <p className="px-2.5 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
             Projects
           </p>
-          {projects.map((project) => (
-            <NavLink
+          {ungrouped.map((project) => (
+            <ProjectLink
               key={project.id}
-              to={`/projects/${project.id}`}
-              onClick={onNavigate}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm',
-                  isActive ? 'bg-accent font-medium' : 'hover:bg-accent/60',
-                )
-              }
-            >
-              <span className="min-w-0 truncate">{project.name}</span>
-              {counts.get(project.id) ? (
-                <Badge className="ml-auto">{counts.get(project.id)}</Badge>
-              ) : null}
-            </NavLink>
+              project={project}
+              count={counts.get(project.id)}
+              {...navProps}
+            />
           ))}
         </div>
       ) : null}

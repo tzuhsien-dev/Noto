@@ -50,12 +50,22 @@ small and belong to their note; the note itself soft-deletes).
 
 ### Projects
 
-Fields: `id, userId, name, icon, position, archived, createdAt, updatedAt`.
-Create, rename, archive. Sidebar shows the count of open (not completed, not
-deleted) tasks per project. Icon is one of a small fixed set of Lucide icon
-names — no arbitrary user CSS/colors. Deleting a project is not supported in
-v1 (archive instead); tasks keep `projectId` via `on delete set null` if a
-project is ever removed server-side.
+Fields: `id, userId, name, icon, position, areaId, archived, createdAt,
+updatedAt`. Create, rename, archive, assign to an area. Sidebar shows the
+count of open (not completed, not deleted) tasks per project. Icon is one of
+a small fixed set of Lucide icon names — no arbitrary user CSS/colors.
+Deleting a project is not supported in v1 (archive instead); tasks keep
+`projectId` via `on delete set null` if a project is ever removed
+server-side.
+
+### Areas
+
+Fields: `id, userId, name, position, createdAt, updatedAt`. An optional
+grouping level above projects (e.g. Work, Life). Create, rename, delete.
+The sidebar and Projects page group projects under their area; area-less
+projects show in a flat group. Deleting an area never deletes its projects —
+they become area-less (`on delete set null`, mirrored locally). Areas
+resolve sync conflicts as plain LWW (no conflict copies), like tags.
 
 ### Tags
 

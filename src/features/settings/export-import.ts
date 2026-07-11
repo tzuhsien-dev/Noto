@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { db, setMeta, type NotoDatabase } from '@/db/database'
 import { enqueueMutation } from '@/db/queue'
 import {
+  areaSchema,
   checklistItemSchema,
   noteSchema,
   noteTagSchema,
@@ -25,6 +26,8 @@ export const exportFileSchema = z.object({
     notes: z.array(noteSchema),
     checklistItems: z.array(checklistItemSchema),
     projects: z.array(projectSchema),
+    // Default keeps pre-area exports importable without a version bump.
+    areas: z.array(areaSchema).default([]),
     tags: z.array(tagSchema),
     taskTags: z.array(taskTagSchema),
     noteTags: z.array(noteTagSchema),
@@ -43,6 +46,7 @@ export async function buildExport(database: NotoDatabase = db): Promise<ExportFi
       notes: await database.notes.toArray(),
       checklistItems: await database.checklist_items.toArray(),
       projects: await database.projects.toArray(),
+      areas: await database.areas.toArray(),
       tags: await database.tags.toArray(),
       taskTags: await database.task_tags.toArray(),
       noteTags: await database.note_tags.toArray(),
@@ -106,10 +110,11 @@ export async function validateImport(
     notes: new Set((await database.notes.toArray()).map((r) => r.id)),
     checklistItems: new Set((await database.checklist_items.toArray()).map((r) => r.id)),
     projects: new Set((await database.projects.toArray()).map((r) => r.id)),
+    areas: new Set((await database.areas.toArray()).map((r) => r.id)),
     tags: new Set((await database.tags.toArray()).map((r) => r.id)),
   }
   const counts: ImportPreview['counts'] = {}
-  for (const key of ['tasks', 'notes', 'checklistItems', 'projects', 'tags'] as const) {
+  for (const key of ['tasks', 'notes', 'checklistItems', 'projects', 'areas', 'tags'] as const) {
     const rows = file.data[key]
     counts[key] = {
       total: rows.length,
@@ -153,7 +158,12 @@ export async function mergeImport(
   }
 
   await database.transaction('rw', database.tables, async () => {
-    for (const row of file.data.projects) await insertEntity('project', database.projects, row)
+    for (const row of file.data.areas) await insertEntity('area', database.areas, row)
+    for (const row of file.data.projects) {
+      // Orphaned area references would violate the server FK; ungroup instead.
+      const areaPresent = row.areaId ? await database.areas.get(row.areaId) : true
+      await insertEntity('project', database.projects, areaPresent ? row : { ...row, areaId: null })
+    }
     for (const row of file.data.tags) {
       // Tag names are unique per user; skip imports colliding by name.
       const clash = (await database.tags.toArray()).some(

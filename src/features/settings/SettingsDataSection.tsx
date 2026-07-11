@@ -22,6 +22,7 @@ const PREVIEW_LABELS: Record<string, string> = {
   notes: 'Notes',
   checklistItems: 'Checklist items',
   projects: 'Projects',
+  areas: 'Areas',
   tags: 'Tags',
 }
 

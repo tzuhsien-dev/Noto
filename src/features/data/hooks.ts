@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/database'
-import type { ChecklistItem, Note, Project, Tag, Task } from '@/domain/types'
+import type { Area, ChecklistItem, Note, Project, Tag, Task } from '@/domain/types'
 
 /** All hooks return `undefined` while the first IndexedDB read is in flight. */
 
@@ -20,6 +20,13 @@ export function useChecklistItems(noteId: string | undefined): ChecklistItem[] |
   return useLiveQuery(
     () => (noteId ? db.checklist_items.where('noteId').equals(noteId).sortBy('position') : []),
     [noteId],
+  )
+}
+
+export function useAreas(): Area[] | undefined {
+  return useLiveQuery(
+    async () => (await db.areas.toArray()).sort((a, b) => a.position - b.position),
+    [],
   )
 }
 

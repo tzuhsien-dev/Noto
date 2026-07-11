@@ -6,6 +6,7 @@ export const ENTITY_TABLES: Record<EntityType, string> = {
   checklistItem: 'checklist_items',
   project: 'projects',
   tag: 'tags',
+  area: 'areas',
 }
 
 export const JOIN_TABLES = {

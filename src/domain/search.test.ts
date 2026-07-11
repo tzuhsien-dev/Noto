@@ -86,6 +86,7 @@ describe('search', () => {
       name: 'Milk Run',
       icon: null,
       position: 0,
+      areaId: null,
       archived: false,
       createdAt: NOW,
       updatedAt: NOW,
