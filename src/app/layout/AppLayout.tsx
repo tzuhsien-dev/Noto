@@ -107,9 +107,11 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
       ))}
       {ungrouped.length > 0 ? (
         <div className="space-y-0.5">
-          <p className="px-2.5 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Projects
-          </p>
+          {grouped.length > 0 ? (
+            <p className="px-2.5 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Other
+            </p>
+          ) : null}
           {ungrouped.map((project) => (
             <ProjectLink
               key={project.id}
