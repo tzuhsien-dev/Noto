@@ -51,7 +51,8 @@ React UI ──reads (dexie-react-hooks)──▶ Dexie
 
 - The queue keeps **one entry per entity**, coalesced: insert+delete cancels; update+update keeps the **original** `baseVersion` (conflict detection compares against the server state the first local edit was based on).
 - Every row has a server-trigger-incremented `version`; clients never set it. Push guards with `.eq('version', baseVersion)`; zero rows affected ⇒ conflict.
-- On conflict: remote wins in Dexie; tasks/notes get their unsynced local content re-created as a "(conflict copy)" entity; projects/tags/checklist items/joins are plain LWW.
+- On conflict: remote wins in Dexie; tasks/notes get their unsynced local content re-created as a "(conflict copy)" entity; areas/projects/tags/checklist items/joins are plain LWW.
+- Synced entity types (`ENTITY_TYPES` in `engine.ts`): `area`, `project`, `tag`, `task`, `note`, `checklistItem`. Areas are a grouping level above projects (`projects.areaId`); the Dexie schema is versioned (`database.ts` `.version(n)`), so new entities/indexes land as a migration.
 - Deletes are soft and idempotent.
 
 ### Other structural decisions
