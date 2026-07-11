@@ -175,7 +175,7 @@ describe('areas', () => {
     // The ungrouping is queued for sync (insert + update coalesce to insert).
     const pending = await pendingFor(db, 'project', grouped.id)
     expect(pending?.operation).toBe('insert')
-    expect((pending?.payload as { areaId: string | null }).areaId).toBeNull()
+    expect((pending!.payload as { areaId: string | null }).areaId).toBeNull()
   })
 
   it('queues a delete mutation for a synced area', async () => {
