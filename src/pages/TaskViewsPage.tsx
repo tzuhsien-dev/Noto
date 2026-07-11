@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { PageContainer, PageHeader } from '@/components/PageHeader'
 import { formatDayHeading } from '@/domain/dates'
-import { completedTasks, inboxTasks, isOpen, sortTasks, todayTasks } from '@/domain/filters'
+import { completedTasks, inboxTasks, sortTasks, todayTasks } from '@/domain/filters'
 import { groupUpcoming } from '@/domain/dates'
-import { useTasks } from '@/features/data/hooks'
+import { groupTasksByAreaProject } from '@/domain/grouping'
+import { useAreas, useProjects, useTasks } from '@/features/data/hooks'
 import { QuickAdd } from '@/features/tasks/QuickAdd'
 import { TaskList } from '@/features/tasks/TaskList'
+import { GroupedTaskList } from '@/features/tasks/GroupedTaskList'
 
 export function TodayPage() {
   const tasks = useTasks()
@@ -40,12 +42,16 @@ export function InboxPage() {
 
 export function AllTasksPage() {
   const tasks = useTasks()
+  const projects = useProjects()
+  const areas = useAreas()
+  const groups =
+    tasks && projects && areas ? groupTasksByAreaProject(tasks, projects, areas) : undefined
   return (
     <PageContainer>
       <PageHeader title="All Tasks" />
       <QuickAdd />
-      <TaskList
-        tasks={tasks && sortTasks(tasks.filter(isOpen))}
+      <GroupedTaskList
+        groups={groups}
         emptyTitle="No open tasks"
         emptyDescription="Add your first task above."
       />
