@@ -47,6 +47,9 @@ test('edits task details (priority, due date)', async ({ page }) => {
   await page.getByLabel('Priority').selectOption('high')
   await page.getByLabel('Due date').fill('2030-01-15')
   await page.getByRole('button', { name: 'Save' }).click()
-  await expect(page.getByText('high')).toBeVisible()
-  await expect(page.getByText('Jan 15, 2030')).toBeVisible()
+  // Scope to the task row: bare getByText('high') also matches the dialog's
+  // <option value="high"> while the closing dialog is still in the DOM.
+  const row = page.getByRole('button', { name: /Detailed task/ })
+  await expect(row).toContainText('high')
+  await expect(row).toContainText('Jan 15, 2030')
 })
