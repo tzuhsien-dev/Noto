@@ -12,7 +12,7 @@ import {
 import { addChecklistItem, createNote, softDeleteNote, updateNote } from './repo/notes'
 import { createTag, deleteTag, setTaskTags } from './repo/tags'
 import { createArea, deleteArea } from './repo/areas'
-import { createProject } from './repo/projects'
+import { createProject, deleteProject } from './repo/projects'
 
 const USER = '00000000-0000-4000-8000-0000000000aa'
 
@@ -158,6 +158,35 @@ describe('tags', () => {
     await setTaskTags(task.id, USER, [t2.id], db)
     const rows = await db.task_tags.toArray()
     expect(rows).toEqual([{ taskId: task.id, tagId: t2.id, userId: USER }])
+  })
+})
+
+describe('project delete', () => {
+  it('moves live tasks to Trash, ungroups them, and removes the project', async () => {
+    const project = await createProject({ userId: USER, name: 'Doomed' }, db)
+    const open = await createTask({ userId: USER, title: 'open', projectId: project.id }, db)
+    const done = await createTask({ userId: USER, title: 'done', projectId: project.id }, db)
+    await setTaskCompleted(done.id, true, db)
+    const gone = await createTask({ userId: USER, title: 'gone', projectId: project.id }, db)
+    await softDeleteTask(gone.id, db)
+    const priorDeletedAt = (await db.tasks.get(gone.id))!.deletedAt
+
+    const trashed = await deleteProject(project.id, db)
+
+    expect(trashed).toBe(2) // the already-trashed task doesn't count
+    expect(await db.projects.get(project.id)).toBeUndefined()
+    for (const id of [open.id, done.id, gone.id]) {
+      const task = (await db.tasks.get(id))!
+      expect(task.deletedAt).not.toBeNull()
+      expect(task.projectId).toBeNull()
+    }
+    expect((await db.tasks.get(gone.id))!.deletedAt).toBe(priorDeletedAt)
+  })
+
+  it('cancels an unpushed project insert instead of queueing a delete', async () => {
+    const project = await createProject({ userId: USER, name: 'Never synced' }, db)
+    await deleteProject(project.id, db)
+    expect(await pendingFor(db, 'project', project.id)).toBeUndefined()
   })
 })
 

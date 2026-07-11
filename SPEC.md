@@ -51,12 +51,12 @@ small and belong to their note; the note itself soft-deletes).
 ### Projects
 
 Fields: `id, userId, name, icon, position, areaId, archived, createdAt,
-updatedAt`. Create, rename, archive, assign to an area. Sidebar shows the
-count of open (not completed, not deleted) tasks per project. Icon is one of
-a small fixed set of Lucide icon names — no arbitrary user CSS/colors.
-Deleting a project is not supported in v1 (archive instead); tasks keep
-`projectId` via `on delete set null` if a project is ever removed
-server-side.
+updatedAt`. Create, rename, archive, delete, assign to an area. Sidebar
+shows the count of open (not completed, not deleted) tasks per project.
+Icon is one of a small fixed set of Lucide icon names — no arbitrary user
+CSS/colors. Deleting a project (confirmed) soft-deletes its tasks into
+Trash and ungroups them (`projectId` → null, matching the server's
+`on delete set null`), so restoring a task lands in Inbox.
 
 ### Areas
 

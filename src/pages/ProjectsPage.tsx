@@ -9,8 +9,9 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { Input, NativeSelect } from '@/components/ui/input'
 import { PageContainer, PageHeader } from '@/components/PageHeader'
 import { openCountByProject, projectTasks, sortTasks } from '@/domain/filters'
+import { toast } from 'sonner'
 import { createArea, deleteArea, updateArea } from '@/db/repo/areas'
-import { createProject, updateProject } from '@/db/repo/projects'
+import { createProject, deleteProject, updateProject } from '@/db/repo/projects'
 import { useAreas, useProjects, useTasks } from '@/features/data/hooks'
 import { useUserId } from '@/features/auth/AuthProvider'
 import { QuickAdd } from '@/features/tasks/QuickAdd'
@@ -136,10 +137,12 @@ function ProjectRow({
   project,
   count,
   onEdit,
+  onDelete,
 }: {
   project: Project
   count: number | undefined
   onEdit: (project: Project) => void
+  onDelete: (project: Project) => void
 }) {
   return (
     <li className="group flex items-center gap-2 rounded-md border border-border px-3 py-2">
@@ -165,7 +168,47 @@ function ProjectRow({
       >
         <Archive className="h-4 w-4" aria-hidden />
       </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8"
+        onClick={() => onDelete(project)}
+        aria-label={`Delete ${project.name}`}
+      >
+        <Trash2 className="h-4 w-4" aria-hidden />
+      </Button>
     </li>
+  )
+}
+
+/** Shared confirm for deleting a project (its tasks move to Trash). */
+export function DeleteProjectDialog({
+  project,
+  onOpenChange,
+}: {
+  project: Project | null
+  onOpenChange: (open: boolean) => void
+}) {
+  return (
+    <ConfirmDialog
+      open={project !== null}
+      onOpenChange={onOpenChange}
+      title={`Delete ${project?.name ?? 'project'}?`}
+      description="Its tasks move to Trash, where they can be restored (to Inbox)."
+      confirmLabel="Delete project"
+      onConfirm={() => {
+        if (project) {
+          void deleteProject(project.id).then((trashed) => {
+            toast.success(
+              trashed > 0
+                ? `Project deleted — ${trashed} task${trashed === 1 ? '' : 's'} moved to Trash`
+                : 'Project deleted',
+            )
+          })
+        }
+        onOpenChange(false)
+      }}
+    />
   )
 }
 
@@ -176,6 +219,7 @@ export function ProjectsPage() {
   const counts = openCountByProject(tasks)
   const [createOpen, setCreateOpen] = useState(false)
   const [editing, setEditing] = useState<Project | null>(null)
+  const [deleting, setDeleting] = useState<Project | null>(null)
   const [areaCreateOpen, setAreaCreateOpen] = useState(false)
   const [areaEditing, setAreaEditing] = useState<Area | null>(null)
   const [areaDeleting, setAreaDeleting] = useState<Area | null>(null)
@@ -240,6 +284,7 @@ export function ProjectsPage() {
                       project={project}
                       count={counts.get(project.id)}
                       onEdit={setEditing}
+                      onDelete={setDeleting}
                     />
                   ))}
               </ul>
@@ -262,6 +307,7 @@ export function ProjectsPage() {
                     project={project}
                     count={counts.get(project.id)}
                     onEdit={setEditing}
+                    onDelete={setDeleting}
                   />
                 ))}
               </ul>
@@ -278,6 +324,7 @@ export function ProjectsPage() {
           project={editing}
         />
       ) : null}
+      <DeleteProjectDialog project={deleting} onOpenChange={(open) => !open && setDeleting(null)} />
       <AreaFormDialog open={areaCreateOpen} onOpenChange={setAreaCreateOpen} />
       {areaEditing ? (
         <AreaFormDialog

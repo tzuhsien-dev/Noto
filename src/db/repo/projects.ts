@@ -35,6 +35,53 @@ export async function createProject(
   })
 }
 
+/**
+ * Deletes the project; its tasks are soft-deleted into Trash and ungrouped
+ * (projectId → null, matching the server FK) so restoring lands in Inbox.
+ * Returns the number of tasks moved to Trash.
+ */
+export async function deleteProject(id: string, database: NotoDatabase = db): Promise<number> {
+  return database.transaction(
+    'rw',
+    [database.projects, database.tasks, database.pending_mutations],
+    async () => {
+      const current = await database.projects.get(id)
+      if (!current) return 0
+      const now = nowIso()
+      const tasks = await database.tasks.where('projectId').equals(id).toArray()
+      let trashed = 0
+      // Ungroup before the project delete is pushed, so the server FK's
+      // `set null` never races a task update.
+      for (const task of tasks) {
+        if (!task.deletedAt) trashed += 1
+        const updated = {
+          ...task,
+          projectId: null,
+          deletedAt: task.deletedAt ?? now,
+          updatedAt: now,
+        }
+        await database.tasks.put(updated)
+        await enqueueMutation(database, {
+          entityType: 'task',
+          entityId: task.id,
+          operation: 'update',
+          payload: updated,
+          baseVersion: task.version,
+        })
+      }
+      await database.projects.delete(id)
+      await enqueueMutation(database, {
+        entityType: 'project',
+        entityId: id,
+        operation: 'delete',
+        payload: { id },
+        baseVersion: current.version,
+      })
+      return trashed
+    },
+  )
+}
+
 export async function updateProject(
   id: string,
   patch: Partial<Pick<Project, 'name' | 'icon' | 'archived' | 'position' | 'areaId'>>,
