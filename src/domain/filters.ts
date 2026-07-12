@@ -19,9 +19,18 @@ export function todayTasks(tasks: Task[], now: Date = new Date()): Task[] {
   return tasks.filter((t) => isOpen(t) && (isDueToday(t, now) || isOverdue(t, now)))
 }
 
-/** Important: open tasks flagged as high priority. */
-export function importantTasks(tasks: Task[]): Task[] {
-  return tasks.filter((t) => isOpen(t) && t.priority === 'high')
+export type PriorityLevel = Exclude<Priority, 'none'>
+export type PriorityGroup = { priority: PriorityLevel; tasks: Task[] }
+
+/** Priority view: open tasks grouped High → Medium → Low (None excluded). */
+export function groupByPriority(tasks: Task[]): PriorityGroup[] {
+  const order: PriorityLevel[] = ['high', 'medium', 'low']
+  return order
+    .map((priority) => ({
+      priority,
+      tasks: sortTasks(tasks.filter((t) => isOpen(t) && t.priority === priority)),
+    }))
+    .filter((group) => group.tasks.length > 0)
 }
 
 export function completedTasks(tasks: Task[]): Task[] {

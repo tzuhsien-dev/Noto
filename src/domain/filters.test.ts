@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   completedTasks,
-  importantTasks,
+  groupByPriority,
   inboxTasks,
   openCountByProject,
   sortTasks,
@@ -55,13 +55,25 @@ describe('todayTasks', () => {
   })
 })
 
-describe('importantTasks', () => {
-  it('keeps only open high-priority tasks', () => {
+describe('groupByPriority', () => {
+  it('groups open tasks High → Medium → Low, excluding None/completed/deleted', () => {
     const high = task({ priority: 'high' })
     const medium = task({ priority: 'medium' })
+    const low = task({ priority: 'low' })
+    const none = task({ priority: 'none' })
     const highDone = task({ priority: 'high', completed: true })
     const highDeleted = task({ priority: 'high', deletedAt: NOW.toISOString() })
-    expect(importantTasks([high, medium, highDone, highDeleted])).toEqual([high])
+
+    expect(groupByPriority([low, none, high, medium, highDone, highDeleted])).toEqual([
+      { priority: 'high', tasks: [high] },
+      { priority: 'medium', tasks: [medium] },
+      { priority: 'low', tasks: [low] },
+    ])
+  })
+
+  it('omits priority levels with no tasks', () => {
+    const high = task({ priority: 'high' })
+    expect(groupByPriority([high])).toEqual([{ priority: 'high', tasks: [high] }])
   })
 })
 

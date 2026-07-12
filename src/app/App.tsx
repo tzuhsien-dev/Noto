@@ -22,8 +22,8 @@ import { TrashPage } from '@/pages/TrashPage'
 import {
   AllTasksPage,
   CompletedPage,
-  ImportantPage,
   InboxPage,
+  PriorityPage,
   TodayPage,
   UpcomingPage,
 } from '@/pages/TaskViewsPage'
@@ -76,7 +76,7 @@ export function App() {
                     <Route path="/today" element={<TodayPage />} />
                     <Route path="/inbox" element={<InboxPage />} />
                     <Route path="/upcoming" element={<UpcomingPage />} />
-                    <Route path="/important" element={<ImportantPage />} />
+                    <Route path="/priority" element={<PriorityPage />} />
                     <Route path="/all" element={<AllTasksPage />} />
                     <Route path="/completed" element={<CompletedPage />} />
                     <Route path="/notes" element={<NotesPage variant="all" />} />

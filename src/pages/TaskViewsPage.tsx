@@ -2,7 +2,13 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { PageContainer, PageHeader } from '@/components/PageHeader'
 import { formatDayHeading } from '@/domain/dates'
-import { completedTasks, importantTasks, inboxTasks, sortTasks, todayTasks } from '@/domain/filters'
+import {
+  completedTasks,
+  groupByPriority,
+  inboxTasks,
+  sortTasks,
+  todayTasks,
+} from '@/domain/filters'
 import { groupUpcoming } from '@/domain/dates'
 import { groupTasksByAreaProject } from '@/domain/grouping'
 import { useAreas, useProjects, useTasks } from '@/features/data/hooks'
@@ -59,16 +65,30 @@ export function AllTasksPage() {
   )
 }
 
-export function ImportantPage() {
+export function PriorityPage() {
   const tasks = useTasks()
+  const groups = tasks ? groupByPriority(tasks) : undefined
   return (
     <PageContainer>
-      <PageHeader title="Important" />
-      <TaskList
-        tasks={tasks && sortTasks(importantTasks(tasks))}
-        emptyTitle="No important tasks"
-        emptyDescription="Set a task's priority to High to see it here."
-      />
+      <PageHeader title="Priority" />
+      {groups && groups.length > 0 ? (
+        <div className="space-y-5">
+          {groups.map((group) => (
+            <section key={group.priority} aria-label={group.priority}>
+              <h2 className="mb-1 text-sm font-medium text-muted-foreground capitalize">
+                {group.priority}
+              </h2>
+              <TaskList tasks={group.tasks} emptyTitle="" />
+            </section>
+          ))}
+        </div>
+      ) : (
+        <TaskList
+          tasks={groups && []}
+          emptyTitle="No prioritized tasks"
+          emptyDescription="Set a task's priority to High, Medium, or Low to see it here."
+        />
+      )}
     </PageContainer>
   )
 }
