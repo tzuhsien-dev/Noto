@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { completedTasks, inboxTasks, openCountByProject, sortTasks, todayTasks } from './filters'
+import {
+  completedTasks,
+  importantTasks,
+  inboxTasks,
+  openCountByProject,
+  sortTasks,
+  todayTasks,
+} from './filters'
 import type { Task } from './types'
 
 const NOW = new Date(2026, 6, 10, 12, 0, 0)
@@ -45,6 +52,16 @@ describe('todayTasks', () => {
     const noDue = task({})
     const result = todayTasks([dueToday, overdue, overdueDone, future, noDue], NOW)
     expect(result).toEqual([dueToday, overdue])
+  })
+})
+
+describe('importantTasks', () => {
+  it('keeps only open high-priority tasks', () => {
+    const high = task({ priority: 'high' })
+    const medium = task({ priority: 'medium' })
+    const highDone = task({ priority: 'high', completed: true })
+    const highDeleted = task({ priority: 'high', deletedAt: NOW.toISOString() })
+    expect(importantTasks([high, medium, highDone, highDeleted])).toEqual([high])
   })
 })
 

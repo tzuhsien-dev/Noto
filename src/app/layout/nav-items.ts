@@ -3,6 +3,7 @@ import {
   CalendarDays,
   CheckCircle2,
   FileText,
+  Flag,
   Folder,
   Inbox,
   Layers,
@@ -24,6 +25,7 @@ export const TASK_NAV: NavItem[] = [
   { to: '/today', label: 'Today', icon: Star },
   { to: '/inbox', label: 'Inbox', icon: Inbox },
   { to: '/upcoming', label: 'Upcoming', icon: CalendarDays },
+  { to: '/important', label: 'Important', icon: Flag },
   { to: '/all', label: 'All Tasks', icon: Layers },
   { to: '/completed', label: 'Completed', icon: CheckCircle2 },
 ]

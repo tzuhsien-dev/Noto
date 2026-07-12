@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { PageContainer, PageHeader } from '@/components/PageHeader'
 import { formatDayHeading } from '@/domain/dates'
-import { completedTasks, inboxTasks, sortTasks, todayTasks } from '@/domain/filters'
+import { completedTasks, importantTasks, inboxTasks, sortTasks, todayTasks } from '@/domain/filters'
 import { groupUpcoming } from '@/domain/dates'
 import { groupTasksByAreaProject } from '@/domain/grouping'
 import { useAreas, useProjects, useTasks } from '@/features/data/hooks'
@@ -54,6 +54,20 @@ export function AllTasksPage() {
         groups={groups}
         emptyTitle="No open tasks"
         emptyDescription="Add your first task above."
+      />
+    </PageContainer>
+  )
+}
+
+export function ImportantPage() {
+  const tasks = useTasks()
+  return (
+    <PageContainer>
+      <PageHeader title="Important" />
+      <TaskList
+        tasks={tasks && sortTasks(importantTasks(tasks))}
+        emptyTitle="No important tasks"
+        emptyDescription="Set a task's priority to High to see it here."
       />
     </PageContainer>
   )

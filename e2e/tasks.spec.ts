@@ -54,6 +54,20 @@ test('edits task details (priority, due date)', async ({ page }) => {
   await expect(row).toContainText('Jan 15, 2030')
 })
 
+test('high-priority tasks appear in the Important view', async ({ page }) => {
+  await signIn(page)
+  await page.goto('/#/inbox')
+  await addTask(page, 'Ship release')
+
+  await page.getByRole('button', { name: /Ship release/ }).click()
+  await page.getByLabel('Priority').selectOption('high')
+  await page.getByRole('button', { name: 'Save' }).click()
+
+  await page.goto('/#/important')
+  await expect(page.getByRole('heading', { name: 'Important' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Ship release/ })).toBeVisible()
+})
+
 test('sets a due date to today and clears it from the details dialog', async ({ page }) => {
   await signIn(page)
   await page.goto('/#/inbox')

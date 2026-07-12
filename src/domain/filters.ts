@@ -19,6 +19,11 @@ export function todayTasks(tasks: Task[], now: Date = new Date()): Task[] {
   return tasks.filter((t) => isOpen(t) && (isDueToday(t, now) || isOverdue(t, now)))
 }
 
+/** Important: open tasks flagged as high priority. */
+export function importantTasks(tasks: Task[]): Task[] {
+  return tasks.filter((t) => isOpen(t) && t.priority === 'high')
+}
+
 export function completedTasks(tasks: Task[]): Task[] {
   return tasks
     .filter((t) => isActive(t) && t.completed)
