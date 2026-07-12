@@ -196,7 +196,7 @@ export function AppLayout() {
             onClick={() => setDrawerOpen(false)}
             aria-label="Close menu"
           />
-          <div className="absolute inset-y-0 left-0 w-72 overflow-y-auto bg-background pb-[env(safe-area-inset-bottom)] shadow-xl">
+          <div className="absolute inset-y-0 left-0 w-72 overflow-y-auto bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] shadow-xl">
             <div className="flex items-center justify-between px-4 pt-4">
               <span className="text-lg font-semibold">Noto</span>
               <Button
@@ -215,7 +215,7 @@ export function AppLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Top bar */}
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-3 pt-[env(safe-area-inset-top)] md:px-4">
+        <header className="flex min-h-14 shrink-0 items-center gap-2 border-b border-border px-3 pt-[env(safe-area-inset-top)] md:px-4">
           <Button
             variant="ghost"
             size="icon"
