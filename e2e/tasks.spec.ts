@@ -53,3 +53,22 @@ test('edits task details (priority, due date)', async ({ page }) => {
   await expect(row).toContainText('high')
   await expect(row).toContainText('Jan 15, 2030')
 })
+
+test('sets a due date to today and clears it from the details dialog', async ({ page }) => {
+  await signIn(page)
+  await page.goto('/#/inbox')
+  await addTask(page, 'Groceries')
+
+  // Quick "Today" button puts it in the Today view.
+  await page.getByRole('button', { name: /Groceries/ }).click()
+  await page.getByRole('button', { name: 'Today', exact: true }).click()
+  await page.getByRole('button', { name: 'Save' }).click()
+  await page.goto('/#/today')
+  await expect(page.getByRole('button', { name: /Groceries/ })).toBeVisible()
+
+  // "Clear" removes the due date, so it drops out of Today.
+  await page.getByRole('button', { name: /Groceries/ }).click()
+  await page.getByRole('button', { name: 'Clear', exact: true }).click()
+  await page.getByRole('button', { name: 'Save' }).click()
+  await expect(page.getByRole('button', { name: /Groceries/ })).toHaveCount(0)
+})

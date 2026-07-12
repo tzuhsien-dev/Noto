@@ -92,7 +92,7 @@ export function TaskDetailsDialog({ task, onClose }: TaskDetailsDialogProps) {
             rows={4}
           />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <label className="block text-sm">
+            <div className="block text-sm">
               <span className="mb-1 block text-muted-foreground">Due date</span>
               <Input
                 type="date"
@@ -100,7 +100,31 @@ export function TaskDetailsDialog({ task, onClose }: TaskDetailsDialogProps) {
                 onChange={(e) => form.setValue('dueAt', dateInputToIso(e.target.value))}
                 aria-label="Due date"
               />
-            </label>
+              <div className="mt-1.5 flex gap-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={() =>
+                    form.setValue('dueAt', dateInputToIso(isoToDateInput(new Date().toISOString())))
+                  }
+                >
+                  Today
+                </Button>
+                {form.watch('dueAt') ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-xs text-muted-foreground"
+                    onClick={() => form.setValue('dueAt', null)}
+                  >
+                    Clear
+                  </Button>
+                ) : null}
+              </div>
+            </div>
             <label className="block text-sm">
               <span className="mb-1 block text-muted-foreground">Priority</span>
               <NativeSelect {...form.register('priority')} aria-label="Priority">
