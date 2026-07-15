@@ -86,22 +86,6 @@ body,
   height: 100%;
 }
 
-/* iOS standalone PWA (black-translucent status bar): WebKit under-reports the
-   layout viewport height by the status-bar inset, stranding a dead band at the
-   bottom of the app and of any fixed full-screen layer. Stretch both by the
-   missing inset. -webkit-touch-callout scopes this to iOS only — Android PWAs
-   report the viewport correctly and must not be inflated. */
-@media (display-mode: standalone) {
-  @supports (-webkit-touch-callout: none) {
-    html,
-    body,
-    #root,
-    .standalone-vh-fix {
-      height: calc(100% + env(safe-area-inset-top));
-    }
-  }
-}
-
 body {
   background-color: var(--background);
   color: var(--foreground);
