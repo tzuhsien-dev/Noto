@@ -11,7 +11,8 @@ export const Checkbox = forwardRef<
     <CheckboxPrimitive.Root
       ref={ref}
       className={cn(
-        'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-input',
+        // 20px visual, ~44px hit target via the ::after extension.
+        'relative flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-input after:absolute after:-inset-3',
         'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground',
         'focus-visible:outline-2 focus-visible:outline-ring',
         className,

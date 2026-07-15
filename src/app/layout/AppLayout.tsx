@@ -9,10 +9,12 @@ import { useAreas, useProjects, useTasks } from '@/features/data/hooks'
 import { useUserId } from '@/features/auth/AuthProvider'
 import { NewTaskDialog } from '@/features/tasks/NewTaskDialog'
 import { SearchDialog } from '@/features/search/SearchDialog'
+import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { useUiState } from '@/app/ui-state'
 import { startSyncEngine, stopSyncEngine } from '@/sync/engine'
 import { useAuth } from '@/features/auth/AuthProvider'
 import { cn } from '@/lib/utils'
+import { MobileTabBar } from './MobileTabBar'
 import { NOTE_NAV, ORG_NAV, TASK_NAV, type NavItem } from './nav-items'
 import { SyncStatusChip } from './SyncStatusChip'
 
@@ -52,7 +54,7 @@ function ProjectLink({
       className={({ isActive }) =>
         cn(
           'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm',
-          isActive ? 'bg-accent font-medium' : 'hover:bg-accent/60',
+          isActive ? 'bg-accent font-medium text-accent-foreground' : 'hover:bg-accent/60',
         )
       }
     >
@@ -188,30 +190,20 @@ export function AppLayout() {
       </aside>
 
       {/* Mobile drawer */}
-      {drawerOpen ? (
-        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-label="Navigation menu">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setDrawerOpen(false)}
-            aria-label="Close menu"
-          />
-          <div className="absolute inset-y-0 left-0 w-72 overflow-y-auto bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] shadow-xl">
-            <div className="flex items-center justify-between px-4 pt-4">
-              <span className="text-lg font-semibold">Noto</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setDrawerOpen(false)}
-                aria-label="Close menu"
-              >
+      <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <SheetContent aria-describedby={undefined}>
+          <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+          <div className="flex items-center justify-between px-4 pt-4">
+            <span className="text-lg font-semibold">Noto</span>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" aria-label="Close menu">
                 <X className="h-5 w-5" aria-hidden />
               </Button>
-            </div>
-            <NavContent onNavigate={() => setDrawerOpen(false)} />
+            </SheetClose>
           </div>
-        </div>
-      ) : null}
+          <NavContent onNavigate={() => setDrawerOpen(false)} />
+        </SheetContent>
+      </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Top bar */}
@@ -243,9 +235,11 @@ export function AppLayout() {
         </header>
 
         {/* Content */}
-        <main className="min-h-0 flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+        <main className="min-h-0 flex-1 overflow-y-auto pb-4 md:pb-[calc(env(safe-area-inset-bottom)+1rem)]">
           <Outlet />
         </main>
+
+        <MobileTabBar onOpenMenu={() => setDrawerOpen(true)} />
       </div>
 
       <NewTaskDialog />

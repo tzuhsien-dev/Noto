@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { formatDueDate, isOverdue } from '@/domain/dates'
 import type { Priority, Project, Tag, Task } from '@/domain/types'
 import { setTaskCompleted } from '@/db/repo/tasks'
+import { completeTaskWithUndo } from './task-actions'
 import { cn } from '@/lib/utils'
 
 const priorityColor: Record<Priority, string> = {
@@ -57,7 +58,11 @@ export function TaskItem({
         <Checkbox
           className="mt-0.5"
           checked={task.completed}
-          onCheckedChange={(checked) => void setTaskCompleted(task.id, checked === true)}
+          onCheckedChange={(checked) =>
+            checked === true
+              ? void completeTaskWithUndo(task.id, task.title)
+              : void setTaskCompleted(task.id, false)
+          }
           aria-label={
             task.completed ? `Mark ${task.title} as not done` : `Mark ${task.title} as done`
           }

@@ -15,7 +15,7 @@ VITE_E2E=1 npm run dev   # dev server on the in-memory fake backend (no Supabase
 npm run typecheck        # tsc -b (TypeScript strict)
 npm run lint             # oxlint + prettier --check
 npm run format           # prettier --write
-npm test                 # Vitest unit + component tests
+npm test                 # Vitest unit + component tests (npm run test:watch for watch mode)
 npx vitest run src/sync/engine.test.ts        # single unit test file
 npm run test:e2e         # Playwright (boots its own dev server on port 5177)
 npx playwright test e2e/tasks.spec.ts --project=desktop   # single E2E spec

@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { CheckSquare, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { setTasksCompleted } from '@/db/repo/tasks'
-import { deleteTasksWithUndo } from './task-actions'
+import { completeTasksWithUndo, deleteTasksWithUndo } from './task-actions'
 
 /**
  * Shared bulk-selection state and actions for task lists. Owning this in one
@@ -28,7 +27,7 @@ export function useTaskSelection() {
   }
 
   const completeSelected = () => {
-    void setTasksCompleted([...selectedIds], true)
+    void completeTasksWithUndo([...selectedIds])
     exitSelection()
   }
 

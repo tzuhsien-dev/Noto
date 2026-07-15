@@ -105,7 +105,7 @@ export function TaskDetailsDialog({ task, onClose }: TaskDetailsDialogProps) {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="h-7 px-2 text-xs"
+                  className="h-9 px-3 text-xs"
                   onClick={() =>
                     form.setValue('dueAt', dateInputToIso(isoToDateInput(new Date().toISOString())))
                   }
@@ -117,7 +117,7 @@ export function TaskDetailsDialog({ task, onClose }: TaskDetailsDialogProps) {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-7 px-2 text-xs text-muted-foreground"
+                    className="h-9 px-3 text-xs text-muted-foreground"
                     onClick={() => form.setValue('dueAt', null)}
                   >
                     Clear

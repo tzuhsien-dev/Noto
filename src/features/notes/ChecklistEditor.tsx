@@ -43,6 +43,9 @@ export function ChecklistEditor({ noteId }: { noteId: string }) {
                   void updateChecklistItem(item.id, { content })
                 }
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.currentTarget.blur()
+              }}
               aria-label="Checklist item"
               className={cn(
                 'h-8 border-none bg-transparent px-1',
@@ -52,7 +55,7 @@ export function ChecklistEditor({ noteId }: { noteId: string }) {
             <Button
               variant="ghost"
               size="sm"
-              className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+              className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100"
               onClick={() => void deleteChecklistItem(item.id)}
               aria-label={`Delete ${item.content}`}
             >

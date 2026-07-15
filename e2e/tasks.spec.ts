@@ -13,9 +13,11 @@ test('completes a task and finds it under Completed', async ({ page }) => {
   await page.goto('/#/inbox')
   await addTask(page, 'File expenses')
   await page.getByRole('checkbox', { name: 'Mark File expenses as done' }).click()
-  await expect(page.getByText('File expenses')).toHaveCount(0)
+  // The completion toast repeats the title, so scope row checks to buttons.
+  await expect(page.getByText('Task completed')).toBeVisible()
+  await expect(page.getByRole('button', { name: /File expenses/ })).toHaveCount(0)
   await page.goto('/#/completed')
-  await expect(page.getByText('File expenses')).toBeVisible()
+  await expect(page.getByRole('button', { name: /File expenses/ })).toBeVisible()
 })
 
 test('deletes a task and undoes it from the toast', async ({ page }) => {
