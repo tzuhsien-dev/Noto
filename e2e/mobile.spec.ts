@@ -40,6 +40,24 @@ test('mobile: completing a task can be undone from the toast', async ({ page }) 
   await expect(page.getByRole('button', { name: /Fat finger target/ })).toBeVisible()
 })
 
+test('mobile: tab bar stays pinned when content overflows', async ({ page }) => {
+  await signIn(page)
+  await page.goto('/#/inbox')
+  const input = page.getByLabel('Add a task').first()
+  for (let i = 1; i <= 25; i++) {
+    await input.fill(`Filler task ${i}`)
+    await input.press('Enter')
+  }
+  await expect(page.getByRole('button', { name: /Filler task 25/ })).toBeVisible()
+  // The list scrolls inside <main>; the window itself must not scroll and the
+  // tab bar must stay pinned inside the viewport.
+  await expect(page.getByRole('navigation', { name: 'Primary' })).toBeInViewport()
+  const windowScrollable = await page.evaluate(
+    () => document.documentElement.scrollHeight > document.documentElement.clientHeight,
+  )
+  expect(windowScrollable).toBe(false)
+})
+
 test('mobile: search tab opens the search dialog', async ({ page }) => {
   await signIn(page)
   await page

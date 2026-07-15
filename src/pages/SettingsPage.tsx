@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { LogOut, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,54 +10,6 @@ import { formatRelative } from '@/domain/dates'
 import { useTheme, type ThemeSetting } from '@/app/theme'
 import { requestSync } from '@/sync/engine'
 import { SettingsDataSection } from '@/features/settings/SettingsDataSection'
-
-// TEMPORARY: live viewport readout to diagnose the iOS standalone PWA
-// bottom-gap bug on a real device. Remove once the root cause is fixed.
-function readViewport() {
-  const probe = document.createElement('div')
-  probe.style.cssText =
-    'position:fixed;visibility:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)'
-  document.body.appendChild(probe)
-  const cs = getComputedStyle(probe)
-  const envTop = cs.paddingTop
-  const envBottom = cs.paddingBottom
-  probe.remove()
-  const vv = window.visualViewport
-  return [
-    `innerWH: ${window.innerWidth}x${window.innerHeight}`,
-    `html client: ${document.documentElement.clientWidth}x${document.documentElement.clientHeight}`,
-    `html scrollH: ${document.documentElement.scrollHeight}  scrollY: ${window.scrollY}`,
-    `visualViewport: h=${vv ? Math.round(vv.height) : '?'} offsetTop=${vv ? Math.round(vv.offsetTop) : '?'} scale=${vv ? vv.scale : '?'}`,
-    `screen: ${window.screen.width}x${window.screen.height}`,
-    `env top/bottom: ${envTop} / ${envBottom}`,
-    `standalone: ${window.matchMedia('(display-mode: standalone)').matches}`,
-  ].join('\n')
-}
-
-function ViewportDebug() {
-  const [text, setText] = useState('')
-  useEffect(() => {
-    const update = () => setText(readViewport())
-    update()
-    window.addEventListener('resize', update)
-    window.addEventListener('scroll', update)
-    window.visualViewport?.addEventListener('resize', update)
-    window.visualViewport?.addEventListener('scroll', update)
-    return () => {
-      window.removeEventListener('resize', update)
-      window.removeEventListener('scroll', update)
-      window.visualViewport?.removeEventListener('resize', update)
-      window.visualViewport?.removeEventListener('scroll', update)
-    }
-  }, [])
-  return (
-    <Section title="Viewport diagnostics (temporary)">
-      <pre className="text-xs leading-relaxed whitespace-pre-wrap text-muted-foreground">
-        {text}
-      </pre>
-    </Section>
-  )
-}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -162,8 +113,6 @@ export function SettingsPage() {
             </p>
           </div>
         </Section>
-
-        <ViewportDebug />
 
         <Section title="About">
           <dl className="space-y-2 text-sm">
