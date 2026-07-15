@@ -16,10 +16,17 @@ function readStoredTheme(): ThemeSetting {
   return stored === 'light' || stored === 'dark' ? stored : 'system'
 }
 
+// Hex equivalents of --background in index.css; keeps the iOS standalone
+// status bar (painted from theme-color) matching the app chrome.
+const THEME_COLOR = { light: '#fcfcfc', dark: '#0e1218' }
+
 function applyTheme(theme: ThemeSetting): void {
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
   const dark = theme === 'dark' || (theme === 'system' && prefersDark)
   document.documentElement.classList.toggle('dark', dark)
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', dark ? THEME_COLOR.dark : THEME_COLOR.light)
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
